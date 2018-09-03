@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product index{% endblock %}
+
+{% block body %}
+    {% if products %}
+
+
+    <table id="products" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Origin</th>
+                <th>Type</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.origin }}</td>
+                <td>{{ product.type }}</td>
+                <td>
+                    <a href="/product/{{ product.id }}" class="btn btn-success">Show</a>
+                </td>
+                <td>
+                    <a href="/product/edit/{{ product.id }}" class="btn btn-warning">Edit</a>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-danger delete-product" data-id="{{ product.id }}">Delete</a>
+                </td>
+
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No products to display yet</p>
+    {% endif %}
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="/js/mainProducts.js"></script>
+{% endblock %}

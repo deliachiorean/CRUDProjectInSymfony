@@ -20,6 +20,8 @@ class ArticleController extends Controller{
 
         $articles=$this->getDoctrine()->getRepository(Article::class)->findAll();
         return $this->render('articles/index.html.twig',array('articles'=>$articles));
+
+
     }
 
 

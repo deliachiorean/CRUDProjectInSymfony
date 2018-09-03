@@ -10,9 +10,11 @@ namespace App\Controller;
 
 
 use App\Entity\User;
+
 use Symfony\Component\Routing\Annotation\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\Validation\UserValidation;
 
@@ -39,5 +41,7 @@ class DefaultController extends Controller
         return $this->render('default/index.html.twig',[
             'html' => $html
         ]);
+
+
     }
 }

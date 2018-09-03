@@ -3,7 +3,10 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+
+
 parameters:
+    locale: 'en'
 #  o_valoare: 90
 
 services:
@@ -11,7 +14,7 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
+        public: true       # Allows optimizing the container by removing unused services; this also means
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
     validator_user:
@@ -41,3 +44,8 @@ services:
         resource: '../src/Repository'
         autowire: true
         tags: ['doctrine.repository_service']
+
+    productController:
+      class: App\Controller\ProductController
+      public: true
+
