@@ -7,7 +7,7 @@
  */
 
 namespace App\Entity;
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints;
 
 
 class Technology

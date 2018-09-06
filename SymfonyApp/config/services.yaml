@@ -13,13 +13,19 @@ services:
         arguments:
             - '@doctrine.dbal.delia_connection'
 
-    app.tech_service:
-        class: 'App\Service\TechnologyService'
+    app.tech_validator:
+        class: 'App\Validator\TagValidator'
         arguments:
             - '@app.db_repository'
+
+    app.tech_service:
+        class: 'App\Service\TechnologyService'
+        arguments: ['@app.db_repository','@Symfony\Component\Validator\Validator\ValidatorInterface','@app.tech_validator']
 
     app.tech_controller:
         class: 'App\Controller\TechnologyController'
         public: true
         arguments:
             - '@app.tech_service'
+
+

@@ -12,6 +12,7 @@
         "symfony/flex": "^1.1",
         "symfony/framework-bundle": "^4.1",
         "symfony/http-foundation": "^4.1",
+        "symfony/profiler-pack": "^1.0",
         "symfony/twig-bundle": "*",
         "symfony/validator": "^4.1",
         "symfony/web-server-bundle": "*",

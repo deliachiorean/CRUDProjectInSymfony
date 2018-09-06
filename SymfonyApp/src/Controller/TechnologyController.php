@@ -15,7 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Service\TechnologyService;
 
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class TechnologyController extends Controller
@@ -38,17 +39,19 @@ class TechnologyController extends Controller
         $name=$request->request->get('name');
         $file = $request->files->get('picture');
 
-
         $tag = $request->request->get('tag');
 
+
         $tech= new Technology($name,$file);
+
+
         $result=$this->technologyService->add($tech,$tag);
 
-        if($result=="tagName"){
+        if((in_array("tagName", $result)) || (!in_array("empty",$result))){
             return new Response(Response::HTTP_BAD_REQUEST
 
             );
-        }else if($result=="technologyName"){
+        }else if(in_array("technologyName",$result)){
             return new Response(Response::HTTP_CONFLICT);
         }else {
             $response = new Response(Response::HTTP_CREATED);
@@ -56,9 +59,7 @@ class TechnologyController extends Controller
             return $response;
         }
 
-
-
-
     }
+
 
 }

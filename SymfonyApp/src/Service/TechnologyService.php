@@ -11,18 +11,32 @@ namespace App\Service;
 
 
 use App\Entity\Technology;
+use App\Exceptions\EmptyTechnologyException;
 use App\Exceptions\TechnologyExistsException;
 use App\Exceptions\UnknownTagException;
 
 use App\Repository\TechnologyRepository;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use App\Validator\TagValidator;
+use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TechnologyService
 {
     private $technologyRepository;
-    public function __construct(TechnologyRepository $technologyRepository)
+    private $validator;
+    private $tagValidator;
+
+    public function __construct(TechnologyRepository $technologyRepository, ValidatorInterface $validator, TagValidator $tagValidator )
     {
         $this->technologyRepository=$technologyRepository;
+        $this->validator=$validator;
+        $this->tagValidator=$tagValidator;
+    }
+
+    public function checkIfEmpty(Technology $technology){
+        $errors=$this->validator->validate($technology);
+        return count($errors);
+
     }
 
     /**
@@ -51,9 +65,9 @@ class TechnologyService
      * returns tru if tag is in and you can insert
      * returns false if tagName doesn't exist
      */
-    public function checkTag( $tag){
-         return $this->technologyRepository->checkIfTagExists($tag);
-    }
+//    public function checkTag( $tag){
+//         return $this->technologyRepository->checkIfTagExists($tag);
+//    }
 
     public function getTagId(  $tag){
         return $this->technologyRepository->GetIdForTag($tag);
@@ -70,9 +84,13 @@ class TechnologyService
      */
     public function add(Technology $technology,$assocTag){
         $msg=[];
-        $added=false;
-        $addedRel=false;
 
+        try {
+            if ($this->checkIfEmpty($technology) > 0)
+                throw new EmptyTechnologyException();
+        }catch (EmptyTechnologyException $e){
+            array_push($msg,"empty");
+        }
 
        try {
            if ($this->checkTechnologyName($technology) === false)
@@ -82,7 +100,7 @@ class TechnologyService
        }
 
        try{
-           if ($this->checkTag($assocTag) === false) {
+           if ($this->tagValidator->validate($assocTag) === false) {
                throw new UnknownTagException();
            }
        }catch (UnknownTagException $exc2){

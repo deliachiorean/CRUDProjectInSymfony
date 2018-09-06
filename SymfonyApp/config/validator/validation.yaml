@@ -1,5 +1,12 @@
-picture:
-      - NotBlank:
-          message: "Technology picture cannot be empty!"
-      - File:
-          mimeTypes: {'image/jpg,', 'image/jpeg'}
+App\Entity\Technology:
+  properties:
+    name:
+      - NotBlank: ~
+
+
+    picture:
+
+      - NotBlank: ~
+      - Image:
+          mimeTypes: [image/jpeg, image/jpg]
+
