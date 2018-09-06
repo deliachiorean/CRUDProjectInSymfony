@@ -1,3 +1,4 @@
-#index:
-#    path: /
-#    controller: App\Controller\DefaultController::index
+my_service:
+    path: /insert
+    methods: [POST]
+    controller: app.tech_controller:newTech
