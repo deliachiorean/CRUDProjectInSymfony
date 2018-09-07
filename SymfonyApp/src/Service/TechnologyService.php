@@ -14,10 +14,8 @@ use App\Entity\Technology;
 use App\Exceptions\EmptyTechnologyException;
 use App\Exceptions\TechnologyExistsException;
 use App\Exceptions\UnknownTagException;
-
 use App\Repository\TechnologyRepository;
 use App\Validator\TagValidator;
-use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TechnologyService
@@ -35,6 +33,9 @@ class TechnologyService
 
     public function checkIfEmpty(Technology $technology){
         $errors=$this->validator->validate($technology);
+
+        var_dump($errors);
+        die();
         return count($errors);
 
     }
@@ -89,7 +90,7 @@ class TechnologyService
             if ($this->checkIfEmpty($technology) > 0)
                 throw new EmptyTechnologyException();
         }catch (EmptyTechnologyException $e){
-            array_push($msg,"empty");
+            array_push($msg,"errors");
         }
 
        try {
@@ -117,26 +118,12 @@ class TechnologyService
            $techName=$technology->getName();
            $tech_id=(int)$this->getIdForTechnology($techName)["id"];
 
-//           var_dump($tag_id);
-//           echo $assocTag;
-//           echo "======";
-//            var_dump($tech_id);
-//            echo $technology->getName();
-//            die();
 
            $b=$this->addTechnologyTagRelation($tech_id,$tag_id);
 
 
-
-//           var_Dump ($added);
-//            var_dump($addedRel);
-//            die();
-
            if($a===True && $b===True)
                 array_push($msg,"OK");
-
-//           var_dump($this->getIdForTechnology($technology),$tag_id);
-//           die();
 
        }
        return $msg;

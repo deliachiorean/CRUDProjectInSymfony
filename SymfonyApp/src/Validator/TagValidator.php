@@ -30,7 +30,10 @@ class TagValidator
      */
     public function validate($value)
     {
-        return $this->technologyRepository->checkIfTagExists($value);
+        if($this->technologyRepository->checkIfTagExists($value)===true){
+            return true;
+        }
+        return false;
 
     }
 
