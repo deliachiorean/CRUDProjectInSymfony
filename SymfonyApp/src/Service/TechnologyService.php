@@ -31,49 +31,41 @@ class TechnologyService
         $this->tagValidator=$tagValidator;
     }
 
-    public function checkIfEmpty(Technology $technology){
+    /**
+     * @param Technology $technology
+     * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+     */
+    private function checkIfEmpty(Technology $technology){
         $errors=$this->validator->validate($technology);
 
-        var_dump($errors);
-        die();
-        return count($errors);
+        return $errors;
 
     }
 
     /**
      * @param Technology $technology
      * @return bool
-     * returns true if everything is ok and you can don the insert
-     * returns false if name already in
+
      */
-    public function checkTechnologyName(Technology $technology){
+    private function checkTechnologyName(Technology $technology){
         if($this->technologyRepository->checkIfTechnologyAlreadyExists($technology->getName())===True){
            return false;
         }
         return true;
     }
-    public function addTechnology(Technology $technology){
+    private function addTechnology(Technology $technology){
        return $this->technologyRepository->insertTechnology($technology->getName(), $technology->getPicture());
 
     }
-    public function getIdForTechnology($techName){
+    private function getIdForTechnology($techName){
         return $this->technologyRepository->getTechnologyId($techName);
     }
 
-    /**
-     * @param $tag
-     * @return bool
-     * returns tru if tag is in and you can insert
-     * returns false if tagName doesn't exist
-     */
-//    public function checkTag( $tag){
-//         return $this->technologyRepository->checkIfTagExists($tag);
-//    }
 
-    public function getTagId(  $tag){
+    private function getTagId(  $tag){
         return $this->technologyRepository->GetIdForTag($tag);
     }
-    public function addTechnologyTagRelation($tech_id,$Tag_id){
+    private function addTechnologyTagRelation($tech_id,$Tag_id){
         return $this->technologyRepository->insertNewTechnologyTagRelation($tech_id,$Tag_id);
     }
 
@@ -81,52 +73,30 @@ class TechnologyService
     /**
      * @param Technology $technology
      * @param $assocTag
-     * @return array
+     * @throws EmptyTechnologyException
+     * @throws TechnologyExistsException
+     * @throws UnknownTagException
      */
     public function add(Technology $technology,$assocTag){
-        $msg=[];
-
-        try {
-            if ($this->checkIfEmpty($technology) > 0)
-                throw new EmptyTechnologyException();
-        }catch (EmptyTechnologyException $e){
-            array_push($msg,"errors");
-        }
-
-       try {
-           if ($this->checkTechnologyName($technology) === false)
-               throw new TechnologyExistsException();
-       }catch (TechnologyExistsException $exc) {
-           array_push($msg,"technologyName");
-       }
-
-       try{
-           if ($this->tagValidator->validate($assocTag) === false) {
-               throw new UnknownTagException();
-           }
-       }catch (UnknownTagException $exc2){
-           array_push($msg,"tagName");
-       }
-
-//
-
-       if(sizeof($msg)==0 ) {
-           $a=$this->addTechnology($technology);
 
 
-           $tag_id =(int)$this->getTagId($assocTag)["id"];
+        if (sizeof($this->checkIfEmpty($technology)) > 0)
+            throw new EmptyTechnologyException($this->checkIfEmpty($technology));
+
+        if ($this->checkTechnologyName($technology) === false)
+           throw new TechnologyExistsException();
+
+        if ($this->tagValidator->validate($assocTag) === false)
+           throw new UnknownTagException();
+
+
+
+           $this->addTechnology($technology);
+
+           $tag_id =(int)$this->getTagId($assocTag);
            $techName=$technology->getName();
-           $tech_id=(int)$this->getIdForTechnology($techName)["id"];
-
-
-           $b=$this->addTechnologyTagRelation($tech_id,$tag_id);
-
-
-           if($a===True && $b===True)
-                array_push($msg,"OK");
-
-       }
-       return $msg;
+           $tech_id=(int)$this->getIdForTechnology($techName);
+           $this->addTechnologyTagRelation($tech_id,$tag_id);
 
     }
 }

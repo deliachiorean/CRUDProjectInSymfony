@@ -8,5 +8,5 @@ App\Entity\Technology:
 
       - NotBlank: ~
       - Image:
-          mimeTypes: [image/jpeg, image/jpg]
+          mimeTypes: [image/jpg, image/jpeg ]
 

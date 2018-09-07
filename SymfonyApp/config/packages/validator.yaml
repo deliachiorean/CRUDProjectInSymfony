@@ -1,13 +1,3 @@
-
-#App\Entity\Technology:
-#  properties:
-#    name:
-#      - NotBlank: ~
-#
-#
-#    picture:
-#
-#      - NotBlank: ~
-#      - Image:
-#          mimeTypes: [image/jpeg, image/jpg]
-#
+framework:
+    validation:
+        email_validation_mode: html5
