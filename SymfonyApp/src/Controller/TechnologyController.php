@@ -8,88 +8,80 @@
 
 namespace App\Controller;
 use App\Entity\Technology;
+use App\Exceptions\UnexpectedTypeTagException;
 use App\Exceptions\EmptyTechnologyException;
 use App\Exceptions\TechnologyExistsException;
 use App\Exceptions\UnknownTagException;
-use App\Repository\TechnologyRepository;
-use App\Service\RouteService;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\TechnologyService;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
-class TechnologyController extends Controller
+class TechnologyController
 {
     private $technologyService;
-    private $routeService;
+    private $urlGenerator;
+    private $imagesDir;
 
-    public function __construct(TechnologyService $technologyService)
+    public function __construct(TechnologyService $technologyService, UrlGeneratorInterface $urlGenerator, string $imagesDir)
     {
         $this->technologyService = $technologyService;
+        $this->urlGenerator=$urlGenerator;
+        $this->imagesDir = $imagesDir;
+    }
+
+    public function generateUrlForLocationHeader($id)
+    {
+        $url=$this->urlGenerator->generate('my_location',array('id'=>$id),UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return $url;
+
+    }
+    public function getTechnology(Request $request){
+        return new Response();
 
     }
 
-    public function newTech(Request $request){
 
-
+    public function newTech(Request $request)
+    {
         $name=$request->request->get('name');
-        $file = $request->files->get('picture');
-        //$file->move("C:\Users\dchiorean\Desktop\CRUDProjectInSymfony\SymfonyApp\UploadedPictures",$file->getClientOriginalName());
 
+        /**
+         * @var $file UploadedFile
+         */
+        $file = $request->files->get('picture');
+        $newFileName = md5(uniqid());
+
+        $file->move($this->imagesDir, $newFileName);
 
         $tag = $request->request->get('tag');
 
-
-        $tech= new Technology($name,$file);
-//        var_dump($tech);
-//        die();
-
+        $tech = new Technology($name,$this->imagesDir . DIRECTORY_SEPARATOR . $newFileName);
 
         try{
             $this->technologyService->add($tech,$tag);
-            $response= new Response("Technology added successfully!",201);
-            //$response->headers->set("Location",
-            return $response;
+
         }catch (EmptyTechnologyException $ex){
-            var_dump($ex->getMessage());
-            die();
-            $response= new Response($ex->getMessage(),400);
-            $response->headers->set("Location","http://127.0.0.1:8000/insert/" . $name);
-            return $response;
-        }catch (TechnologyExistsException $ex){
-            return new Response("Technology Name Already Exists!",409);
+            throw new BadRequestHttpException($ex->getMessage(), $ex);
+        }catch (TechnologyExistsException $ex) {
+            throw new ConflictHttpException("Technology Name Already Exists!", $ex);
         }catch (UnknownTagException $ex){
-            return new Response("The given tag does not exist in the database!",400);
+            throw new BadRequestHttpException("The given tag does not exist in the database!",$ex);
         }
 
-//        $result=$this->technologyService->add($tech,$tag);
-////        var_dump($resul
-////        die();
-//
-//
-////
-//
-//        if((in_array("tagName", $result)) || (in_array("errors",$result))){
-//            $response= new Response(Response::HTTP_BAD_REQUEST);
-//            $response->setStatusCode(400);
-//            return $response;
-//        }else if(in_array("technologyName",$result)){
-//            $response= new Response(Response::HTTP_CONFLICT);
-//            $response->setStatusCode(409);
-//            return $response;
-//        }else
-//            if(sizeof($result)==1 && $result[0]=="OK"){
-//                $response= new Response(Response::HTTP_CREATED);
-//                $response->setStatusCode(201);
-//                $response->headers->set('Location', "http://127.0.0.1:8000/insert/" . $name);
-//                return $response;
-//        }
-//        else
-//            return new Response("something went wrong!");
+        $response = new Response("Technology added successfully!",201);
+        $id = $this->technologyService->getIdForTechnology($tech->getName());
+        $url = $this->generateUrlForLocationHeader($id);
+        $response->headers->set("Location",$url);
+        $response->headers->set("Content-Type","text/plain");
 
+        return $response;
     }
-
-
 }

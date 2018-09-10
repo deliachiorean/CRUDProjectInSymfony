@@ -1,4 +1,10 @@
 my_service:
-    path: /insert
+    path: /technology
     methods: [POST]
     controller: app.tech_controller:newTech
+
+my_location:
+    path: /technology/{id}
+    methods: [GET]
+    controller: app.tech_controller:getTechnology
+

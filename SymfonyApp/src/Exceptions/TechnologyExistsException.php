@@ -9,7 +9,6 @@
 namespace App\Exceptions;
 
 
-use App\Entity\Technology;
 use Exception;
 
 class TechnologyExistsException extends Exception

@@ -11,35 +11,43 @@ namespace App\Service;
 
 
 use App\Entity\Technology;
+
 use App\Exceptions\EmptyTechnologyException;
 use App\Exceptions\TechnologyExistsException;
 use App\Exceptions\UnknownTagException;
 use App\Repository\TechnologyRepository;
-use App\Validator\TagValidator;
+use App\Validator\TagConstraint;
+
+use Symfony\Component\Validator\ConstraintViolationInterface;
+
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TechnologyService
 {
     private $technologyRepository;
     private $validator;
-    private $tagValidator;
 
-    public function __construct(TechnologyRepository $technologyRepository, ValidatorInterface $validator, TagValidator $tagValidator )
+    public function __construct(TechnologyRepository $technologyRepository, ValidatorInterface $validator)
     {
         $this->technologyRepository=$technologyRepository;
         $this->validator=$validator;
-        $this->tagValidator=$tagValidator;
     }
 
     /**
      * @param Technology $technology
-     * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+     * @return string[]|null
      */
     private function checkIfEmpty(Technology $technology){
         $errors=$this->validator->validate($technology);
 
-        return $errors;
+        $errorMessages = [];
 
+        /** @var $error ConstraintViolationInterface */
+        foreach ($errors as $error) {
+            $errorMessages[] = $error->getMessage();
+        }
+
+        return $errorMessages;
     }
 
     /**
@@ -53,11 +61,13 @@ class TechnologyService
         }
         return true;
     }
+
+
     private function addTechnology(Technology $technology){
        return $this->technologyRepository->insertTechnology($technology->getName(), $technology->getPicture());
 
     }
-    private function getIdForTechnology($techName){
+    public function getIdForTechnology($techName){
         return $this->technologyRepository->getTechnologyId($techName);
     }
 
@@ -79,24 +89,27 @@ class TechnologyService
      */
     public function add(Technology $technology,$assocTag){
 
+        $errorMessages = $this->checkIfEmpty($technology);
+        if (sizeof($errorMessages) > 0) {
+            throw new EmptyTechnologyException(implode('. ', $errorMessages));
+        }
+        if ($this->checkTechnologyName($technology) === false) {
+            throw new TechnologyExistsException();
+        }
+        $tagConstraint = new TagConstraint();
+        $errors = $this->validator->validate($assocTag, $tagConstraint);
 
-        if (sizeof($this->checkIfEmpty($technology)) > 0)
-            throw new EmptyTechnologyException($this->checkIfEmpty($technology));
+        if (count($errors) > 0) {
+            throw new UnknownTagException();
+        }
 
-        if ($this->checkTechnologyName($technology) === false)
-           throw new TechnologyExistsException();
+        $this->addTechnology($technology);
 
-        if ($this->tagValidator->validate($assocTag) === false)
-           throw new UnknownTagException();
-
-
-
-           $this->addTechnology($technology);
-
-           $tag_id =(int)$this->getTagId($assocTag);
-           $techName=$technology->getName();
-           $tech_id=(int)$this->getIdForTechnology($techName);
-           $this->addTechnologyTagRelation($tech_id,$tag_id);
+        $tag_id =$this->getTagId($assocTag);
+        $techName=$technology->getName();
+        $tech_id=$this->getIdForTechnology($techName);
+        $this->addTechnologyTagRelation($tech_id,$tag_id);
 
     }
+
 }

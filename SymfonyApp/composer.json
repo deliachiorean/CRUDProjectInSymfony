@@ -20,7 +20,8 @@
         "symfony/yaml": "*"
     },
     "require-dev": {
-        "symfony/dotenv": "*"
+        "symfony/dotenv": "*",
+        "phpunit/phpunit": "^7"
     },
     "config": {
         "preferred-install": {

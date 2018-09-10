@@ -5,8 +5,6 @@ App\Entity\Technology:
 
 
     picture:
-
-      - NotBlank: ~
-      - Image:
-          mimeTypes: [image/jpg, image/jpeg ]
-
+      - NotNull: ~
+#      - Image:
+#          mimeTypes: [image/jpg, image/jpeg ]

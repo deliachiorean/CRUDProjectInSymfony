@@ -7,26 +7,14 @@
  */
 
 namespace App\Entity;
-use Symfony\Component\Validator\Constraints;
 
 
 class Technology
 {
-
-//    /**
-//     * @var
-//     */
     private $id;
-//
-//    /**
-//     * @Assert\NotBlank(message="Technology name cannot be empty!")
-//     */
+
     private $name;
 
-//    /**
-//     * @Assert\NotBlank(message="Technology picture cannot be empty!")
-//     * @Assert\File(mimeTypes={ 'image/jpeg,', 'image/jpeg'})
-//     */
     private $picture;
 
 

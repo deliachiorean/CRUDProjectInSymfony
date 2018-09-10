@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    pictures_directory: '%kernel.project_dir%/public/uploads/technology_images'
 
 services:
 
@@ -14,18 +15,22 @@ services:
             - '@doctrine.dbal.delia_connection'
 
     app.tech_validator:
-        class: 'App\Validator\TagValidator'
+        class: 'App\Validator\TagConstraintValidator'
         arguments:
             - '@app.db_repository'
+        tags:
+          - {name: 'validator.constraint_validator'}
 
     app.tech_service:
         class: 'App\Service\TechnologyService'
-        arguments: ['@app.db_repository','@Symfony\Component\Validator\Validator\ValidatorInterface','@app.tech_validator']
+        arguments:
+          - '@app.db_repository'
+          - '@Symfony\Component\Validator\Validator\ValidatorInterface'
 
     app.tech_controller:
         class: 'App\Controller\TechnologyController'
         public: true
         arguments:
-            - '@app.tech_service'
-
-
+          - '@app.tech_service'
+          - '@router'
+          - '%pictures_directory%'

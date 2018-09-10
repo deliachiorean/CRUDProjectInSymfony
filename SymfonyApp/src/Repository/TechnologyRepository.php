@@ -49,6 +49,9 @@ class TechnologyRepository
         }
     }
 
+
+
+
     /**
      * @param $tag
      * @return bool
@@ -85,7 +88,7 @@ class TechnologyRepository
             ->execute()
             ->fetch(FetchMode::ASSOCIATIVE);
 
-        return $result["id"];
+        return (int)$result["id"];
 
     }
 
@@ -103,7 +106,7 @@ class TechnologyRepository
             ->execute()
             ->fetch(FetchMode::ASSOCIATIVE);
 
-        return $result["id"];
+        return (int)$result["id"];
 
 
     }
@@ -111,37 +114,41 @@ class TechnologyRepository
     /**
      * @param $technologyName
      * @param $technologyPicture
+     * @return bool
      */
 
     public function insertTechnology($technologyName,$technologyPicture){
 
         $sql=$this->connection->createQueryBuilder();
         $sql->insert('technologies')
-            ->setValue('name','?')
-            ->setValue('picture','?')
-            ->setParameter(0,$technologyName)
-            ->setParameter(1,$technologyPicture)
+            ->setValue('name',':name')
+            ->setValue('picture',':picture')
+            ->setParameter('name',$technologyName)
+            ->setParameter('picture',$technologyPicture)
             ->execute();
 
+        return true;
 
 
     }
 
     /**
-     * @param $idTechnology
-     * @param $idTag
+     * @param int $idTechnology
+     * @param int $idTag
+     * @return bool
      */
     public function insertNewTechnologyTagRelation( int $idTechnology, int $idTag){
 
         $sql=$this->connection->createQueryBuilder();
         $sql->insert('technology_tags')
-            ->setValue('technology_id','?')
-            ->setValue('tag_id','?')
-            ->setParameter(0,$idTechnology)
-            ->setParameter(1,$idTag)
+            ->setValue('technology_id',':technology_id')
+            ->setValue('tag_id',':tag_id')
+            ->setParameter('technology_id',$idTechnology)
+            ->setParameter('tag_id',$idTag)
             ->execute();
 
 
+        return true;
 
 
     }
