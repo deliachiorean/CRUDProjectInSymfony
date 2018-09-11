@@ -37,7 +37,7 @@ class TechnologyService
      * @param Technology $technology
      * @return string[]|null
      */
-    private function checkIfEmpty(Technology $technology){
+    private function getValidationErrors(Technology $technology){
         $errors=$this->validator->validate($technology);
 
         $errorMessages = [];
@@ -55,7 +55,7 @@ class TechnologyService
      * @return bool
 
      */
-    private function checkTechnologyName(Technology $technology){
+    public function checkTechnologyName(Technology $technology){
         if($this->technologyRepository->checkIfTechnologyAlreadyExists($technology->getName())===True){
            return false;
         }
@@ -63,7 +63,7 @@ class TechnologyService
     }
 
 
-    private function addTechnology(Technology $technology){
+    public function addTechnology(Technology $technology){
        return $this->technologyRepository->insertTechnology($technology->getName(), $technology->getPicture());
 
     }
@@ -72,10 +72,10 @@ class TechnologyService
     }
 
 
-    private function getTagId(  $tag){
-        return $this->technologyRepository->GetIdForTag($tag);
+    public function getTagId(  $tag){
+        return $this->technologyRepository->getIdForTag($tag);
     }
-    private function addTechnologyTagRelation($tech_id,$Tag_id){
+    public function addTechnologyTagRelation($tech_id,$Tag_id){
         return $this->technologyRepository->insertNewTechnologyTagRelation($tech_id,$Tag_id);
     }
 
@@ -89,7 +89,7 @@ class TechnologyService
      */
     public function add(Technology $technology,$assocTag){
 
-        $errorMessages = $this->checkIfEmpty($technology);
+        $errorMessages = $this->getValidationErrors($technology);
         if (sizeof($errorMessages) > 0) {
             throw new EmptyTechnologyException(implode('. ', $errorMessages));
         }

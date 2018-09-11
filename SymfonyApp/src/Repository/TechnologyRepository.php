@@ -79,7 +79,7 @@ class TechnologyRepository
      * returns id for tag
      */
 
-    public function GetIdForTag($tag){
+    public function getIdForTag($tag){
         $sql=$this->connection->createQueryBuilder();
         $result=$sql->select('id')
             ->from('tags')
