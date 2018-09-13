@@ -56,26 +56,7 @@ class TechnologyServiceTest extends TestCase
         $this->technologyRepository = new TechnologyRepository($this->connectionMock);
     }
 
-    public function testAddTechnology()
-    {
 
-
-    }
-
-    public function testAddTechnologyTagRelation()
-    {
-
-    }
-
-    public function testAdd()
-    {
-
-    }
-
-    public function testCheckTechnologyName()
-    {
-
-    }
 
     public function testGetIdForTechnology()
     {
@@ -98,4 +79,7 @@ class TechnologyServiceTest extends TestCase
         self::assertEquals($id,$idFromDb);
 
     }
+
+
+
 }

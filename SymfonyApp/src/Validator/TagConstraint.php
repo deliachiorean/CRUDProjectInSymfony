@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraint;
 class TagConstraint extends Constraint
 
 {
+
     public $message='The tag "{{ tag }}" cannot be found in the database.';
 
 }

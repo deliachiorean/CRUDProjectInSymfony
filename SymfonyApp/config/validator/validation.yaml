@@ -1,10 +1,13 @@
 App\Entity\Technology:
   properties:
     name:
-      - NotBlank: ~
-
-
+      - NotBlank: { message: Name cannot be blank }
     picture:
-      - NotNull: ~
-#      - Image:
-#          mimeTypes: [image/jpg, image/jpeg ]
+      - NotNull: { message: Picture cannot be null }
+      - Image:
+         notFoundMessage: Image not uploaded
+         uploadErrorMessage: The image could not upload. Try again
+         mimeTypes: [image/jpeg, image/jpg]
+         mimeTypesMessage: The file types must be jpg or jpeg
+
+

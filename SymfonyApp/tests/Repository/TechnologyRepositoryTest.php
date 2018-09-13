@@ -55,7 +55,7 @@ class TechnologyRepositoryTest extends TestCase
     public function testCheckIfTagExists()
     {
 
-        $tag="backend";
+        $tag="tagname";
 
         $this->connectionMock
             ->expects($this->once())
@@ -91,7 +91,8 @@ class TechnologyRepositoryTest extends TestCase
             ->method('fetchAll')
             ->willReturn([]);
 
-        $this->technologyRepository->checkIfTagExists($tag);
+        $rez=$this->technologyRepository->checkIfTagExists($tag);
+        Assert::assertEquals(false,$rez);
 
 
 
@@ -136,7 +137,8 @@ class TechnologyRepositoryTest extends TestCase
             ->method('fetchAll')
             ->willReturn([]);
 
-        $this->technologyRepository->checkIfTechnologyAlreadyExists($tech->getName());
+        $rez=$this->technologyRepository->checkIfTechnologyAlreadyExists($tech->getName());
+        Assert::assertEquals(false,$rez);
 
     }
 
@@ -145,8 +147,6 @@ class TechnologyRepositoryTest extends TestCase
 
         $tag= new Tag("frontend");
         $id=$tag->getId();
-
-
 
         $this->connectionMock
             ->expects($this->once())
@@ -179,7 +179,8 @@ class TechnologyRepositoryTest extends TestCase
 
         $this->statementMock
             ->expects($this->once())
-            ->method('fetch');
+            ->method('fetch')
+            ->will($this->returnArgument('id'));
 
 
         $dbid=$this->technologyRepository->getIdForTag("frontend");
@@ -187,8 +188,6 @@ class TechnologyRepositoryTest extends TestCase
         self::assertEquals($id,$dbid);
 
     }
-
-
 
     public function testGetTechnologyId()
     {
@@ -228,7 +227,9 @@ class TechnologyRepositoryTest extends TestCase
 
         $this->statementMock
             ->expects($this->once())
-            ->method('fetch');
+            ->method('fetch')
+            ->will($this->returnArgument('id'));
+
 
 
         $dbid=$this->technologyRepository->getTechnologyId("Symfony 4");
@@ -240,15 +241,33 @@ class TechnologyRepositoryTest extends TestCase
 
     public function testInsertTechnology()
     {
-//         $technology=new Technology("tech","pict");
-//
-//         $connection=$this->createMock(Connection::class );
-//         $connection->expects($this->any())
-//             ->method('connect')
-//             ->willReturn($connection);
-//         $repositoryTechnology= new TechnologyRepository($connection);
-//         $this->assertEquals(true,$repositoryTechnology->insertTechnology($technology->getName(),$technology->getPicture()));
+        $result=true;
+       $this->connectionMock
+            ->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($this->queryBuilderMock);
 
+        $this->queryBuilderMock
+            ->expects($this->once())
+            ->method('insert')
+            ->willReturn($this->queryBuilderMock);
+
+        $this->queryBuilderMock
+            ->expects($this->any())
+            ->method('setValue')
+            ->willReturn($this->queryBuilderMock);
+        $this->queryBuilderMock
+            ->expects($this->any())
+            ->method('setParameter')
+            ->willReturn($this->queryBuilderMock);
+        $this->queryBuilderMock
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($result);
+
+        $rez=$this->technologyRepository->insertTechnology("techName","picture");
+
+        Assert::assertEquals($result,$rez);
 
 
     }
@@ -256,34 +275,35 @@ class TechnologyRepositoryTest extends TestCase
 
     public function testInsertNewTechnologyTagRelation()
     {
-//        $tag= new Tag("tagname");
-//        $tech= new Technology("techname","picture");
-//
-//        $this->connectionMock
-//            ->expects($this->once())
-//            ->method('createQueryBuilder')
-//            ->willReturn($this->queryBuilderMock);
-//
-//        $this->queryBuilderMock
-//            ->expects($this->once())
-//            ->method('insert')
-//            ->willReturn($this->queryBuilderMock);
-//
-//        $this->queryBuilderMock
-//            ->expects($this->once())
-//            ->method('setValue')
-//            ->willReturn($this->queryBuilderMock);
-//
-//
-//        $this->queryBuilderMock
-//            ->expects($this->once())
-//            ->method('setParameter')
-//            ->willReturn($this->queryBuilderMock);
-//
-//        $this->queryBuilderMock
-//            ->expects($this->once())
-//            ->method('execute')
-//            ->willReturn($this->statementMock);
+
+
+        $result=true;
+        $this->connectionMock
+            ->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($this->queryBuilderMock);
+
+        $this->queryBuilderMock
+            ->expects($this->once())
+            ->method('insert')
+            ->willReturn($this->queryBuilderMock);
+
+        $this->queryBuilderMock
+            ->expects($this->any())
+            ->method('setValue')
+            ->willReturn($this->queryBuilderMock);
+        $this->queryBuilderMock
+            ->expects($this->any())
+            ->method('setParameter')
+            ->willReturn($this->queryBuilderMock);
+        $this->queryBuilderMock
+            ->expects($this->once())
+            ->method('execute')
+            ->willReturn($result);
+
+        $rez=$this->technologyRepository->insertNewTechnologyTagRelation(1,1);
+
+        Assert::assertEquals($result,$rez);
 
 
 

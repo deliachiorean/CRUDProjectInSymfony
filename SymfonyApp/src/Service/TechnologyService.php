@@ -8,25 +8,26 @@
 
 namespace App\Service;
 
-
-
 use App\Entity\Technology;
-
 use App\Exceptions\EmptyTechnologyException;
 use App\Exceptions\TechnologyExistsException;
 use App\Exceptions\UnknownTagException;
 use App\Repository\TechnologyRepository;
 use App\Validator\TagConstraint;
-
 use Symfony\Component\Validator\ConstraintViolationInterface;
-
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TechnologyService
 {
+
     private $technologyRepository;
     private $validator;
 
+    /**
+     * TechnologyService constructor.
+     * @param TechnologyRepository $technologyRepository
+     * @param ValidatorInterface $validator
+     */
     public function __construct(TechnologyRepository $technologyRepository, ValidatorInterface $validator)
     {
         $this->technologyRepository=$technologyRepository;
@@ -37,48 +38,58 @@ class TechnologyService
      * @param Technology $technology
      * @return string[]|null
      */
-    private function getValidationErrors(Technology $technology){
+    protected function getValidationErrors(Technology $technology){
         $errors=$this->validator->validate($technology);
-
         $errorMessages = [];
 
         /** @var $error ConstraintViolationInterface */
         foreach ($errors as $error) {
             $errorMessages[] = $error->getMessage();
         }
-
         return $errorMessages;
     }
 
     /**
      * @param Technology $technology
      * @return bool
-
      */
     public function checkTechnologyName(Technology $technology){
-        if($this->technologyRepository->checkIfTechnologyAlreadyExists($technology->getName())===True){
-           return false;
-        }
-        return true;
+       return !$this->technologyRepository->checkIfTechnologyAlreadyExists($technology->getName());
     }
 
-
+    /**
+     * @param Technology $technology
+     * @return bool
+     */
     public function addTechnology(Technology $technology){
        return $this->technologyRepository->insertTechnology($technology->getName(), $technology->getPicture());
 
     }
+
+    /**
+     * @param $techName
+     * @return mixed
+     */
     public function getIdForTechnology($techName){
         return $this->technologyRepository->getTechnologyId($techName);
     }
 
-
+    /**
+     * @param $tag
+     * @return mixed
+     */
     public function getTagId(  $tag){
         return $this->technologyRepository->getIdForTag($tag);
     }
+
+    /**
+     * @param $tech_id
+     * @param $Tag_id
+     * @return bool
+     */
     public function addTechnologyTagRelation($tech_id,$Tag_id){
         return $this->technologyRepository->insertNewTechnologyTagRelation($tech_id,$Tag_id);
     }
-
 
     /**
      * @param Technology $technology
@@ -111,5 +122,37 @@ class TechnologyService
         $this->addTechnologyTagRelation($tech_id,$tag_id);
 
     }
+
+
+
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
+    ////////////////if enough time////////////////
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
+
+    /**
+     * @param $username
+     * @return bool
+     */
+    public function checkIfUsernameExits($username){
+
+
+        return $this->technologyRepository->checkIfUsernameExistsInDatabase($username);
+    }
+
+
+    /**
+     * @param $id
+     * @return bool
+     */
+
+    public function checkIfTechnologyIsInTechnologyValidators($id){
+
+        return $this->technologyRepository->checkIfTechnologyIdExistsInTechnologyValidators($id);
+
+    }
+
+
 
 }
